@@ -1,0 +1,17 @@
+#! /usr/bin/perl
+use Eirotic;
+use App::Atombomb;
+
+# shift is important while i slurp ARGV just after
+my $format = shift @ARGV
+    or die "i need at least an output format (md, atom)"; 
+
+$format ~~ [qw< md atom >]
+    or die "$format format isn't supported";
+
+my $input = do { local $/; <> };
+
+given ($format) {
+    say atom $input when 'atom';
+    say md   $input when 'md';
+}
