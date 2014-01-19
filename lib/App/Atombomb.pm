@@ -18,41 +18,9 @@ our @EXPORT = qw<
     md
 >;
 
-our $VERSION = '0.0';
-
 # ABSTRACT: from simple markdown to atom feed
 
-=head1 TODO
-
-=head2 new header format ?
-
-YAML surrounded by C<^#(> and C<^#)> ?
-
-    #( title: a better id
-    id: a-better-entry-prolog-for-atombomb
-    published:
-    updated:
-    #)
-    
-=head2 create App::Atombomb
-
-but first:
-
-    * make it configurable
-    * be sure about the name
-    * write tests
-
-=head1 internal functions documentation
-
-=head1 parse_entry_header
-
-the header is set by the atom/entry format which
-is currently C<%FT%T+01:00>, which is a short form for
-C<%Y-%m-%dT%H:%M:%S+01:00>. please consult the man
-of C<GNU date> for more explanation.
-
-=cut
-
+our $VERSION = '0.0';
 our $FOUND_HEADER = qr{
     ^ \#\( (?<created>
           \d{4} - \d{2} - \d{2}
@@ -62,6 +30,13 @@ our $FOUND_HEADER = qr{
     \s* $
 }xms;
 
+=head1 internal functions documentation
+
+=head2 parse_entry_header
+
+parse the header or an entry as described in the command documentation .
+
+=cut
 sub parse_entry_header (_) {
     my $text = shift;
     return unless $text =~ m{$FOUND_HEADER};
@@ -153,7 +128,8 @@ return the atom xml of the whole feed content (no root tag).
 =cut
 sub feed_content (_) {
     my $v = shift;
-    updated{$$v{updated} || $$v{entries}[0]{created} || die YAML::Dump $v }
+    ''
+    , updated{$$v{updated} || $$v{entries}[0]{created} || die YAML::Dump $v }
     , id{$$v{id}}
     , author{$$v{author}}
     , title{$$v{title}}
@@ -179,7 +155,7 @@ func atom ( $input ) {
             apply { (entry_for @$_) || die}
             chunksOf 2, \@chunks ];
 
-    say '<?xml version="1.0" encoding="UTF-8"?><feed xml:lang="en-US" xmlns="http://www.w3.org/2005/Atom">'
+    '<?xml version="1.0" encoding="UTF-8"?><feed xml:lang="en-US" xmlns="http://www.w3.org/2005/Atom">'
     , (feed_content $v)
     , '</feed>';
 }

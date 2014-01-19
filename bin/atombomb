@@ -15,3 +15,67 @@ given ($format) {
     say atom $input when 'atom';
     say md   $input when 'md';
 }
+
+=head1 atombomb, a simple atom feed maintain tool
+
+atombomb acts as a clasic unix filter, examples:
+
+    cat entry* | atombomb md | pandoc -s > news.html
+    cat entry* | atombomb atom > atom.xml
+    atombomb md feed.md | pandoc -s > news.html
+    atombomb atom feed.md > atom.xml
+
+there is an example of feed
+
+    id: tag:eiro,2014:experimental
+    title: (.. eiro (brain) (news))
+    author: Marc Chantreux
+    alternates:
+        http://eiro.github.io/news/: {rel: alternate, type: text/html}
+        http://eiro.github.io/atom-experimental.xml: {rel: self, type: application/atom+xml }
+
+    #(2014-01-18T22:08:52+01:00) last post 
+    
+    markdown of the post here
+
+    #(2014-01-18T22:08:52+01:00) post post 
+
+    markdown of the post here
+
+    #(2014-01-18T22:08:52+01:00) older post
+
+    markdown of the post here
+
+=head2 the h1 format
+
+general format 
+
+    #(date) title
+
+where date is in the format specified in atom RFC (TODO: link there). which is
+C<%FT%T+01:00>, or in short C<%Y-%m-%dT%H:%M:%S+01:00>. please consult the man
+of C<GNU date> for more explanation.
+
+=head3 zsh helper
+
+in your C<~/.zshenv> put
+
+    atom/entry () { date +"#(%FT%T+01:00) $*" }
+
+and use zsh as a filter into your favorite editor 
+
+    atom/entry "my new title" 
+
+will be translated as appropriate format
+
+=head2 new header format ?
+
+in the future, it would be helpfull to have an alternate, richer syntax:
+YAML surrounded by C<^#(> and C<^#)>
+
+    #( title: a better id
+    id: a-better-entry-prolog-for-atombomb
+    published: 2014-01-18T22:08:52+01:00
+    updated: 2014-01-18T22:08:52+01:00
+    #)
+
