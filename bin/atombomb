@@ -58,15 +58,11 @@ of C<GNU date> for more explanation.
 
 =head3 zsh helper
 
-in your C<~/.zshenv> put
-
-    atom/entry () { date +"#(%FT%T+01:00) $*" }
-
-and use zsh as a filter into your favorite editor 
+U<https://github.com/eiro/uze/blob/master/atombomb> is an example of helper i
+use from vim to create the entry header. i type C<!!zsh> when the cursor is on
+a line like this
 
     atom/entry "my new title" 
-
-will be translated as appropriate format
 
 =head2 new header format ?
 
