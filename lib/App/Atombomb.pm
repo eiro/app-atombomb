@@ -6,6 +6,7 @@ use Try::Tiny;
 use Text::Unidecode;
 use HTML::Entities;
 use Exporter 'import';
+use re '/xms';
 our @EXPORT = qw<
     parse_entry_header
     piping
@@ -15,6 +16,7 @@ our @EXPORT = qw<
     write_entry
     feed_content
     atom
+    atom2
     md
 >;
 
@@ -27,8 +29,12 @@ our $FOUND_HEADER = qr{
     T     \d{2} : \d{2} : \d{2}
     \+    \d{2} : \d{2} )
     \) \s (?<title> .+?)
-    \s* $
-}xms;
+    \s* $ }xms;
+our $BEFORE_SEPARATOR =
+    qr{ (?=
+          (?: ^\#\( ) # a separator 
+          | \z  # or an end of content
+      ) }xms;
 
 =head1 internal functions documentation
 
@@ -136,6 +142,31 @@ sub feed_content (_) {
     , map write_entry, @{ $$v{entries} };
 }
 
+sub atom2 (_) {
+    my $text = shift;
+    my ($info) = $text =~ m{ (.*?) $BEFORE_SEPARATOR }cg
+        or die "can't find page info in $text";
+        say "POS1 -> ".pos $text;
+        say "next =>", substr $text, pos $text;
+    my $feed =
+        try   {  YAML::Load $info }
+        catch { die "$_ while parsing $info" };
+
+
+        YAML::Dump 
+    +{ %$feed
+    , entries => 
+        [ haah =>  fold sub {
+        say "POSX-> ".pos $text;
+            if ( $text =~
+                m{ \G
+                    $FOUND_HEADER
+                    (?<md> ).*?
+                    $BEFORE_SEPARATOR }cg ) { {%+} }
+            elsif ($text =~ m{\G(.+)\z}cg) { die "yet unparsed: $1" }
+            else  { () } } ] }
+}
+
 func atom ( $input ) {
     my ( $header , @chunks ) = 
         map   s/(\s*\n)\z//rxms
@@ -167,7 +198,9 @@ sub md (_) {
     s{ \A
         .* ^title:  (\N+)
         .*? (?= ^\#\( )
-    }{% $1\n\n}xms;
+    }{}xms;
+    # need a title?
+    # {% $1\n\n}xms; 
 
     s{$FOUND_HEADER}
      {# $+{title}\n<p class="date"> $+{created}</p>\n}xmsg;
