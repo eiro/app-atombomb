@@ -99,7 +99,10 @@ func entry_for ( $header, $md ) {
     } $$e{title};
 
     die "can't parse makdown" unless 
-        $$e{html} = encode_entities pandoc $md;
+        $$e{html} =
+            encode_entities
+            ( (pandoc $md)
+            , '<>&' );
 
     for ($$e{alternates}) {
         $_ or $_ = [], next;
