@@ -1,5 +1,6 @@
 package App::Atombomb;
 use XML::Tag::Atom;
+use XML::Tag 'tagify_keys';
 use Eirotic;
 use IPC::Open2;
 use Try::Tiny;
@@ -134,13 +135,15 @@ sub write_entry (_) {
 
 return the atom xml of the whole feed content (no root tag). 
 
+
+
 =cut
 sub feed_content (_) {
     my $v = shift;
     ''
     , updated{$$v{updated} || $$v{entries}[0]{created} || die YAML::Dump $v }
     , id{$$v{id}}
-    , author{$$v{author}}
+    , ( tagify_keys { author => $$v{author} } )
     , title{$$v{title}}
     , map write_entry, @{ $$v{entries} };
 }
