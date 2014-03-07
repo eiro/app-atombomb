@@ -93,9 +93,10 @@ func entry_for ( $header, $md ) {
 
     map {
         die unless $_;
-        $$e{id} ||= join ','
-            , 'tag:eiro,news'
-            , $$e{created}
+        $$e{id} ||= join ''
+            , 'tag:eiro.github.com,'
+            , ( $$e{created} =~ /^(.{10})/ )
+            , ':'
             ,  unidecode lc s/[^a-zA-Z0-9]+/_/gr;
     } $$e{title};
 
