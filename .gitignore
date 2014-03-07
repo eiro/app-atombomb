@@ -6,3 +6,4 @@ _build
 *.yml
 *.swp
 app-atombomb*
+atom.xsd.xml
