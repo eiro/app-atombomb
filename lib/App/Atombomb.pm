@@ -174,6 +174,12 @@ sub atom2 (_) {
             else  { () } } ] }
 }
 
+func link_alts ($a) {
+    join '', map {
+        link { +{ href => $_ , %{$$a{$_}} } }
+    } keys %$a
+}
+
 func atom ( $input ) {
     my ( $header , @chunks ) = 
         map   s/(\s*\n)\z//rxms
@@ -194,6 +200,7 @@ func atom ( $input ) {
             chunksOf 2, \@chunks ];
 
     '<?xml version="1.0" encoding="UTF-8"?><feed xml:lang="en-US" xmlns="http://www.w3.org/2005/Atom">'
+    , (link_alts $$v{alternates})
     , (feed_content $v)
     , '</feed>';
 }
